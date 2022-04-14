@@ -38,24 +38,12 @@
 
     let isPaid = await DashDayPass._checkPass({ plans, address });
     if (!isPaid) {
-      ready(function () {
-        DashDayPass.addPaywall();
+      DashDayPass._listenTxLock({ address, plans });
+      onDomReady(function () {
+        DashDayPass.addPaywall({ address, plans });
       });
     }
   };
-
-  function ready(cb) {
-    if (document.readyState === "loading") {
-      // The document is still loading
-      document.addEventListener("DOMContentLoaded", function (e) {
-        cb();
-      });
-      return;
-    }
-
-    // The document is loaded completely
-    cb();
-  }
 
   DashDayPass._storage = null;
 
@@ -173,8 +161,9 @@
   };
 
   DashDayPass._position = "";
-  DashDayPass.addPaywall = function () {
+  DashDayPass.addPaywall = function ({ address, plans }) {
     let $body = $("body");
+    let payment = plans[0].amount;
     DashDayPass._position = $body.style.position;
     $body.style.position = "fixed";
     $body.insertAdjacentHTML(
@@ -191,7 +180,20 @@
               background-color: rgba(0,0,0,0.2);
               backdrop-filter: blur(5px);
             "
-          ></div>
+          >
+            <br />
+            <br />
+            <center>
+              <div style="
+                background-color: white;
+                color: #333333;
+              ">
+                Unlock this content for just Đ${payment}.
+                <br />
+                Send Dash to ${address}.
+              </div>
+            </center>
+          </div>
 				`
     );
   };
@@ -201,6 +203,69 @@
     $body.style.position = DashDayPass._position;
     $(".js-paywall").remove();
   };
+
+  DashDayPass._listenTxLock = async function ({ address, plans }) {
+    let eventToListenTo = "txlock";
+    let room = "inv";
+
+    // TODO use WebSockets instead
+    var socket = window.io("https://insight.dash.org/");
+    socket.on("connect", function () {
+      // Join the room.
+      socket.emit("subscribe", room);
+    });
+    socket.on(eventToListenTo, function (data) {
+      console.log(`DEBUG: txlock`, data);
+      // look for address
+      let txid = "";
+      let spent = 0;
+
+      /*
+      {
+        txid: "a920ba9fbf362f463fb2999aa4828909b9ba8564e7ac4911eb5471cca554d168",
+        valueOut: 0.00500005,
+        vout: [
+          { XjAbAdPjKccAZAmBQ1iVwLG59QrLvaAQga: 100001 },
+        ],
+        isRBF: false,
+        txlock: true,
+      };
+      */
+      data.vout.some(function (vout) {
+        return Object.keys(vout).some(function (addr) {
+          if (addr === address) {
+            spent += vout[addr];
+            return true;
+          }
+        });
+      });
+
+      if (!spent) {
+        return;
+      }
+
+      let db = DashDayPass._storage;
+      if (!db) {
+        return;
+      }
+
+      db.setItem("dash-daypass-tx", { id: data.txid });
+      DashDayPass.removePaywall();
+    });
+  };
+
+  function onDomReady(cb) {
+    if (document.readyState === "loading") {
+      // The document is still loading
+      document.addEventListener("DOMContentLoaded", function (e) {
+        cb();
+      });
+      return;
+    }
+
+    // The document is loaded completely
+    cb();
+  }
 
   exports.DashDayPass = DashDayPass;
 })("undefined" === typeof module ? window : module.exports);
