@@ -2,6 +2,8 @@
 
 A simple Đash PayWall for content sites.
 
+<kbd><img width="456" alt="Screen Shot 2022-04-14 at 12 14 20 AM" src="https://user-images.githubusercontent.com/122831/163325020-511136a9-14cf-4e68-a814-0fd57f9a2e74.png"></kbd>
+
 # Usage (in development)
 
 ```html
