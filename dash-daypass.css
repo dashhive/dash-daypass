@@ -1,0 +1,81 @@
+:root {
+    --color-dash-paywall-bg: rgba(255, 255, 255, 0.9);
+    --color-dash-paywall-bg-50:rgba(255, 255, 255, 0.8);
+    --color-dash-paywall-shadow: #f4f4f4;
+    --color-dash-paywall-text: #000;
+    --color-dash-paywall-text-secondary: #999;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    --hover-brightness: 1.2;
+    --line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-dash-paywall-bg: rgba(51, 51, 51, 0.9);
+        --color-dash-paywall-bg-50:rgba(51, 51, 51, 0.8);
+        --color-dash-paywall-shadow: #bbbbbb20;
+        --color-dash-paywall-text: #f7f7f7;
+        --color-dash-paywall-text-secondary: #aaa;
+    }
+}
+.dash-paywall-wrapper{
+  box-sizing: border-box;
+  position: fixed;
+  background-color: rgba(0,0,0,0);
+  top:0;
+  height: 100vh;
+  width: 100%;
+}
+.dash-paywall_gradient{
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 95%;
+  max-height: 90%;
+  background-color: var(--color-dash-paywall-bg);
+  background: linear-gradient(to top,  var(--color-dash-paywall-bg) 95%, var(--color-dash-paywall-bg-50) 100%);
+}
+.dash-paywall{
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 80%;
+  background-color: var(--color-dash-paywall-bg);
+  color: var(--color-dash-paywall-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dash-paywall-center{
+  display: flex;
+  justify-content: center;
+}
+.dash-paywall-plans-container{
+  width: 90%;
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+.dash-paywall-plan{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.dash-paywall-plan p {
+  text-align: center;
+}
+.dash-paywall_QR{
+  margin-top: 0.5rem;
+  height: 25vw;
+  width: 25vw;
+  min-height: 200px;
+  min-width: 200px;
+  background-color: rgb(100,100,100);
+}
+
+small {
+    color: var(--color-dash-paywall-text-secondary);
+}
