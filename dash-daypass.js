@@ -1,3 +1,5 @@
+const msDay = 24 * 60 * 60 * 1000;
+
 (function (exports) {
   "use strict";
 
@@ -13,6 +15,10 @@
 
   let DashDayPass = {};
 
+  // temp for dev
+  let cssUrl = 'dash-daypass.css'
+  $('head').insertAdjacentHTML("beforeEnd", `<link rel="stylesheet" type="text/css" href="${cssUrl}">`)
+
   DashDayPass.init = async function ({ address, plans }) {
     // TODO pro-rate payments that are between plans
     if (!plans) {
@@ -20,6 +26,8 @@
         {
           amount: 0.001,
           duration: 24 * 60 * 60 * 1000,
+          qrSrc:null, // QRcode with default payment amount for this tier
+          address:address,
         },
       ];
     }
@@ -163,45 +171,47 @@
   DashDayPass._position = "";
   DashDayPass.addPaywall = function ({ address, plans }) {
     let $body = $("body");
-    let payment = plans[0].amount;
+    // let payment = plans[0].amount;
     DashDayPass._position = $body.style.position;
     $body.style.position = "fixed";
+    let plansHtmlStr = plans.map(function(plan){
+      let durationDays = plan.duration / msDay;
+      let durationLabel = 'day';
+      if(1 < durationDays){
+        durationLabel+='s'
+      }
+      return `
+      <div class="dash-paywall-plan">
+        <strong>Đ${plan.amount} for ${durationDays} ${durationLabel}. *</strong>
+        <img class="dash-paywall_QR" src="${plan.qrSrc}">
+        <p>${plan.address}</p>
+      </div>
+      `
+    }).join('');
+
     $body.insertAdjacentHTML(
       "beforeend",
       `
-					<div
-            class="js-paywall"
-            style="
-              position: fixed;
-              bottom: 0px;
-              left: 0px;
-              width: 100%;
-              height: 50%;
-              background-color: rgba(0,0,0,0.2);
-              backdrop-filter: blur(5px);
-            "
+        <div class="dash-paywall-wrapper">
+					<div class="dash-paywall_gradient"></div>
+          <div
+            class="dash-paywall"
           >
-            <br />
-            <br />
-            <center>
-              <div style="
-                background-color: white;
-                color: #333333;
-              ">
-                Unlock this content for just Đ${payment}.
-                <br />
-                Send Dash to ${address}.
-              </div>
-            </center>
+            <p class="dash-paywall-center">Unlock this content for just:</p>
+            <div class="dash-paywall-plans-container">
+              ${plansHtmlStr}
+            </div>
+            <small class="dash-paywall-center">* all payments pro-rata above the minimum.</small>
           </div>
-				`
+        </div>
+			`
     );
   };
 
   DashDayPass.removePaywall = function () {
     let $body = $("body");
     $body.style.position = DashDayPass._position;
-    $(".js-paywall").remove();
+    $(".dash-paywall-wrapper").remove();
   };
 
   DashDayPass._listenTxLock = async function ({ address, plans }) {
