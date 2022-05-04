@@ -11,18 +11,26 @@
   }
   */
 
+  let QRCode = window.QRCode;
+
   let DashDayPass = {};
+
+  DashDayPass._satoshis = 100 * 1000 * 1000;
+  DashDayPass._toSatoshis = function (value) {
+    return Math.round(parseFloat(value) * DashDayPass._satoshis);
+  };
 
   DashDayPass.init = async function ({ address, plans }) {
     // TODO pro-rate payments that are between plans
     if (!plans) {
       plans = [
         {
-          amount: 0.001,
+          amount: 0.0001,
           duration: 24 * 60 * 60 * 1000,
         },
       ];
     }
+    DashDayPass._randomize({ address, plans });
 
     DashDayPass._address = address;
     // Which address?
@@ -43,6 +51,35 @@
         DashDayPass.addPaywall({ address, plans });
       });
     }
+  };
+
+  DashDayPass._randomize = async function ({ address, plans }) {
+    plans.forEach(function (plan) {
+      let amount = plans[0].amount;
+      let leeway = amount * (plans[0].leeway || 0.1);
+
+      let fingerprint = Math.random() * leeway;
+      amount -= fingerprint;
+
+      // TODO check both
+      plan.lastFingerprint = plan.fingerprint;
+      plan.lastFingerprintSatoshis = plan.fingerprintSatoshis;
+      plan.fingerprint = amount.toFixed(8);
+      plan.fingerprintSatoshis = DashDayPass._toSatoshis(plan.fingerprint);
+      console.log("DEBUG satoshis:", plan.fingerprintSatoshis);
+
+      plan.dashUri = `dash:${address}?amount=${plan.fingerprint}`;
+      plan.svg = new QRCode({
+        content: plan.dashUri,
+        padding: 4,
+        width: 256,
+        height: 256,
+        color: "#000000",
+        background: "#ffffff",
+        ecl: "M",
+      }).svg();
+    });
+    console.log("DEBUG plans:", plans);
   };
 
   DashDayPass._storage = null;
@@ -121,7 +158,6 @@
 
     // How much?
     //let satoshis = 1_000_000_00
-    let satoshis = 100 * 1000 * 1000;
     let spent = 0;
     txData.vout.forEach(function (vout) {
       let hasAddress = vout.scriptPubKey.addresses.includes(address);
@@ -129,10 +165,10 @@
         return;
       }
 
-      let value = Math.round(parseFloat(vout.value) * satoshis);
+      let value = DashDayPass._toSatoshis(vout.value);
       spent += value;
     });
-    console.log("spent", (spent / satoshis).toFixed(8));
+    console.log("spent", (spent / DashDayPass._satoshis).toFixed(8));
 
     // How old?
     let now = Date.now();
@@ -163,7 +199,9 @@
   DashDayPass._position = "";
   DashDayPass.addPaywall = function ({ address, plans }) {
     let $body = $("body");
+    let plan = plans[0];
     let payment = plans[0].amount;
+
     DashDayPass._position = $body.style.position;
     $body.style.position = "fixed";
     $body.insertAdjacentHTML(
@@ -186,11 +224,17 @@
             <center>
               <div style="
                 background-color: white;
+                border: dashed 2px green;
+                width: 90%;
                 color: #333333;
               ">
                 Unlock this content for just Đ${payment}.
                 <br />
-                Send Dash to ${address}.
+                Send Dash to:
+                <br />
+                ${plan.svg}
+                <br />
+                <a href="${plan.dashUri}">${plan.dashUri}</a>
               </div>
             </center>
           </div>
@@ -215,10 +259,9 @@
       socket.emit("subscribe", room);
     });
     socket.on(eventToListenTo, function (data) {
+      // TODO limit time to 5 minutes?
       console.log(`DEBUG: txlock`, data);
       // look for address
-      let txid = "";
-      let spent = 0;
 
       /*
       {
@@ -231,16 +274,30 @@
         txlock: true,
       };
       */
+
+      let txid = "";
       data.vout.some(function (vout) {
         return Object.keys(vout).some(function (addr) {
-          if (addr === address) {
-            spent += vout[addr];
-            return true;
+          if (addr !== address) {
+            return false;
           }
+          console.info("Found matching address:", addr);
+
+          let payment = vout[addr];
+          if (
+            plans[0].fingerprintSatoshis !== payment &&
+            plans[0].lastFingerprintSatoshis !== payment
+          ) {
+            return false;
+          }
+          console.info("Found matching payment:", payment);
+
+          txid = data.txid;
+          return true;
         });
       });
 
-      if (!spent) {
+      if (!txid) {
         return;
       }
 
@@ -249,7 +306,7 @@
         return;
       }
 
-      db.setItem("dash-daypass-tx", { id: data.txid });
+      db.setItem("dash-daypass-tx", { id: txid });
       DashDayPass.removePaywall();
     });
   };
