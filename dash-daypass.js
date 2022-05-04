@@ -306,7 +306,7 @@
         return;
       }
 
-      db.setItem("dash-daypass-tx", { id: txid });
+      db.setItem("dash-daypass-tx", JSON.stringify({ id: txid }));
       DashDayPass.removePaywall();
     });
   };
