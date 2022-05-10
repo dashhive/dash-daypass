@@ -14,10 +14,24 @@
   let QRCode = window.QRCode;
 
   let DashDayPass = {};
+  DashDayPass.protectedContent = {};
 
   DashDayPass._satoshis = 100 * 1000 * 1000;
   DashDayPass._toSatoshis = function (value) {
     return Math.round(parseFloat(value) * DashDayPass._satoshis);
+  };
+
+  // html body main section dash-daypass-protect
+  DashDayPass.hideProtectedContent = function () {
+    DashDayPass.protectedContent =  $("dash-daypass-protect");
+    let _protectedContent = DashDayPass.protectedContent
+    let before = '<dash-daypass-paywall><h3>HIDDEN</h3></dash-daypass-paywall>'
+    _protectedContent.insertAdjacentHTML(
+      'beforebegin',
+      before
+    );
+    _protectedContent.remove()
+    console.log(_protectedContent)
   };
 
   DashDayPass.init = async function ({ address, plans }) {
@@ -48,6 +62,7 @@
     if (!isPaid) {
       DashDayPass._listenTxLock({ address, plans });
       onDomReady(function () {
+        DashDayPass.hideProtectedContent();
         DashDayPass.addPaywall({ address, plans });
       });
     }
@@ -243,9 +258,15 @@
   };
 
   DashDayPass.removePaywall = function () {
-    let $body = $("body");
-    $body.style.position = DashDayPass._position;
-    $(".js-paywall").remove();
+    // let $body = $("body");
+    // $body.style.position = DashDayPass._position;
+    // $(".js-paywall").remove();
+    let paywallElement = $("dash-daypass-paywall")
+    paywallElement.insertAdjacentHTML(
+      'beforebegin',
+      DashDayPass.protectedContent.innerHTML
+    );
+    paywallElement.remove()
   };
 
   DashDayPass._listenTxLock = async function ({ address, plans }) {
