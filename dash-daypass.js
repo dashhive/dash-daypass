@@ -65,7 +65,7 @@
 
   DashDayPass._randomize = async function ({ address, plans }) {
     plans.forEach(function (plan) {
-      let amount = plans[0].amount;
+      let amount = plan.amount;//plans[0].amount;
       let leeway = amount * (plans[0].leeway || 0.1);
 
       let fingerprint = Math.random() * leeway;
@@ -75,6 +75,7 @@
       plan.lastFingerprint = plan.fingerprint;
       plan.lastFingerprintSatoshis = plan.fingerprintSatoshis;
       plan.fingerprint = amount.toFixed(8);
+      console.log('fingerprint',plan.fingerprint)
       plan.fingerprintSatoshis = DashDayPass._toSatoshis(plan.fingerprint);
       console.log("DEBUG satoshis:", plan.fingerprintSatoshis);
 
@@ -228,7 +229,9 @@
       return `
       <div class="dash-paywall-plan">
         <strong>Đ${plan.amount} for ${durationDays} ${durationLabel}. *</strong>
-        <img class="dash-paywall_QR" src="${plan.qrSrc}">
+        <fig class="dash-paywall_QR"> 
+          ${plan.svg}
+        </fig>
         <p>${plan.address}</p>
       </div>
       `
