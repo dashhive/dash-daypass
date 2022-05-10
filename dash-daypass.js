@@ -16,22 +16,10 @@
   let DashDayPass = {};
   DashDayPass.protectedContent = {};
 
+  DashDayPass._msDay = 24 * 60 * 60 * 1000;
   DashDayPass._satoshis = 100 * 1000 * 1000;
   DashDayPass._toSatoshis = function (value) {
     return Math.round(parseFloat(value) * DashDayPass._satoshis);
-  };
-
-  // html body main section dash-daypass-protect
-  DashDayPass.hideProtectedContent = function () {
-    DashDayPass.protectedContent =  $("dash-daypass-protect");
-    let _protectedContent = DashDayPass.protectedContent
-    let before = '<dash-daypass-paywall><h3>HIDDEN</h3></dash-daypass-paywall>'
-    _protectedContent.insertAdjacentHTML(
-      'beforebegin',
-      before
-    );
-    _protectedContent.remove()
-    console.log(_protectedContent)
   };
 
   DashDayPass.init = async function ({ address, plans }) {
@@ -41,6 +29,14 @@
         {
           amount: 0.0001,
           duration: 24 * 60 * 60 * 1000,
+          qrSrc:null, // QRcode with default payment amount for this tier
+          address:address,
+        },
+        {
+          amount: 0.001,
+          duration: 10*24 * 60 * 60 * 1000,
+          qrSrc: null, // QRcode with default payment amount for this tier
+          address:address,
         },
       ];
     }
@@ -62,7 +58,6 @@
     if (!isPaid) {
       DashDayPass._listenTxLock({ address, plans });
       onDomReady(function () {
-        DashDayPass.hideProtectedContent();
         DashDayPass.addPaywall({ address, plans });
       });
     }
@@ -213,48 +208,51 @@
 
   DashDayPass._position = "";
   DashDayPass.addPaywall = function ({ address, plans }) {
-    let $body = $("body");
-    let plan = plans[0];
-    let payment = plans[0].amount;
+    // DEV STYLING - better import?
+    let cssUrl = 'dash-daypass.css';
+    $('head').insertAdjacentHTML("beforeEnd", `<link rel="stylesheet" type="text/css" href="${cssUrl}">`);
+    // END DEV STYLING
 
-    DashDayPass._position = $body.style.position;
-    $body.style.position = "fixed";
-    $body.insertAdjacentHTML(
-      "beforeend",
+    // let $body = $("body");
+    DashDayPass.protectedContent =  $("dash-daypass-protect");
+    let _protectedContent = DashDayPass.protectedContent;
+
+    // DashDayPass._position = $body.style.position;
+    // $body.style.position = "fixed";
+    let plansHtmlStr = plans.map(function(plan){
+      let durationDays = plan.duration / DashDayPass._msDay;
+      let durationLabel = 'day';
+      if(1 < durationDays){
+        durationLabel+='s'
+      }
+      return `
+      <div class="dash-paywall-plan">
+        <strong>Đ${plan.amount} for ${durationDays} ${durationLabel}. *</strong>
+        <img class="dash-paywall_QR" src="${plan.qrSrc}">
+        <p>${plan.address}</p>
+      </div>
       `
-					<div
-            class="js-paywall"
-            style="
-              position: fixed;
-              bottom: 0px;
-              left: 0px;
-              width: 100%;
-              height: 50%;
-              background-color: rgba(0,0,0,0.2);
-              backdrop-filter: blur(5px);
-            "
-          >
-            <br />
-            <br />
-            <center>
-              <div style="
-                background-color: white;
-                border: dashed 2px green;
-                width: 90%;
-                color: #333333;
-              ">
-                Unlock this content for just Đ${payment}.
-                <br />
-                Send Dash to:
-                <br />
-                ${plan.svg}
-                <br />
-                <a href="${plan.dashUri}">${plan.dashUri}</a>
+    }).join('');
+    let paywallHTML = `
+        <dash-daypass-paywall>
+          <div class="dash-paywall-wrapper">
+            <div class="dash-paywall_gradient"></div>
+            <div class="dash-paywall">
+              <p class="dash-paywall-center">Unlock this content for just:</p>
+              <div class="dash-paywall-plans-container">
+                ${plansHtmlStr}
               </div>
-            </center>
+              <small class="dash-paywall-center">* all payments pro-rata above the minimum.</small>
+            </div>
           </div>
-				`
+        </dash-daypass-paywall>
+			`
+    _protectedContent.insertAdjacentHTML(
+      'beforebegin',
+      paywallHTML
     );
+    _protectedContent.remove();
+    console.log(_protectedContent);
   };
 
   DashDayPass.removePaywall = function () {
