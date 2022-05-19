@@ -21,6 +21,37 @@
   DashDayPass._toSatoshis = function (value) {
     return Math.round(parseFloat(value) * DashDayPass._satoshis);
   };
+  
+  DashDayPass.dashLogoSvg = `<svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="100%" height="100%"
+      viewBox="0 0 64 64"
+    >
+      <path id="Imported Path"
+        fill="#1E75BB" stroke="none" stroke-width="1"
+        d="M 26.22,27.62
+           C 26.22,27.62 3.11,27.62 3.11,27.62
+             3.11,27.62 0.00,36.26 0.00,36.26
+             0.00,36.26 23.36,36.26 23.36,36.26
+             23.36,36.26 26.22,27.62 26.22,27.62 Z
+           M 63.93,19.11
+           C 63.87,18.05 63.56,16.93 63.00,16.00
+             62.50,15.01 61.63,14.26 60.64,13.89
+             59.58,13.39 58.46,13.14 57.28,13.14
+             57.28,13.14 13.85,13.14 13.85,13.14
+             13.85,13.14 10.75,22.46 10.75,22.46
+             10.75,22.46 50.07,22.46 50.07,22.46
+             50.07,22.46 43.86,41.54 43.86,41.54
+             43.86,41.54 4.54,41.54 4.54,41.54
+             4.54,41.54 1.43,50.86 1.43,50.86
+             1.43,50.86 45.04,50.86 45.04,50.86
+             46.35,50.79 47.65,50.55 48.83,50.11
+             50.07,49.43 51.44,48.74 52.62,47.75
+             53.80,46.82 54.80,45.82 55.73,44.64
+             56.47,43.46 57.10,42.28 57.65,41.04
+             57.65,41.04 63.43,22.96 63.43,22.96
+             63.93,21.72 64.12,20.35 63.93,19.11 Z" />
+    </svg>`
 
   DashDayPass.init = async function ({ address, plans }) {
     // TODO pro-rate payments that are between plans
@@ -29,13 +60,19 @@
         {
           amount: 0.0001,
           duration: 24 * 60 * 60 * 1000,
-          qrSrc:null, // QRcode with default payment amount for this tier
+          svg:null, // QRcode with default payment amount for this tier
           address:address,
         },
         {
           amount: 0.001,
           duration: 10*24 * 60 * 60 * 1000,
-          qrSrc: null, // QRcode with default payment amount for this tier
+          svg: null, // QRcode with default payment amount for this tier
+          address:address,
+        },
+        {
+          amount: 0.001,
+          duration: 10*24 * 60 * 60 * 1000,
+          svg: null, // QRcode with default payment amount for this tier
           address:address,
         },
       ];
@@ -82,9 +119,11 @@
       plan.dashUri = `dash:${address}?amount=${plan.fingerprint}`;
       plan.svg = new QRCode({
         content: plan.dashUri,
-        padding: 4,
+        padding: 3,
         width: 256,
         height: 256,
+        join:true,
+        container: "svg-viewbox",
         color: "#000000",
         background: "#ffffff",
         ecl: "M",
@@ -108,6 +147,8 @@
       }
       DashDayPass._storageWarning =
         "We can't track your payment in private browser mode";
+      
+      console.log(DashDayPass._storageWarning)
     }
   };
 
@@ -227,35 +268,43 @@
         durationLabel+='s'
       }
       return `
-      <div class="dash-paywall-plan">
-        <strong>Đ${plan.amount} for ${durationDays} ${durationLabel}. *</strong>
-        <fig class="dash-paywall_QR"> 
-          ${plan.svg}
-        </fig>
-        <p>${plan.address}</p>
+      <div class="dash-daypass-plan">
+        <h3>Đ${plan.amount} for ${durationDays} ${durationLabel}. *</h3>
+        <div class="dash-daypass_QR-wrapper">
+          <fig class="dash-daypass_QR"> 
+            ${plan.svg}
+          </fig>
+          <div class="dash-daypass_QR-unhide">
+            <span>> Show&nbsp;</span>
+              <div class="dash-daypass_dashlogo">
+                ${DashDayPass.dashLogoSvg}
+              </div>
+            <span>&nbsp;QR <</span>
+          </div>
+        </div>
+        <p>Pay with Dash:</p>
+        <a href="${plan.dashUri}">${plan.address}</a>
       </div>
       `
     }).join('');
     let paywallHTML = `
-        <dash-daypass-paywall>
-          <div class="dash-paywall-wrapper">
-            <div class="dash-paywall_gradient"></div>
-            <div class="dash-paywall">
-              <p class="dash-paywall-center">Unlock this content for just:</p>
-              <div class="dash-paywall-plans-container">
+        <dash-daypass>
+            <div class="dash-daypass_gradient"></div>
+            <div class="dash-daypass_body">
+              <h3 class="dash-daypass-center">Unlock this content for just:</h3>
+              <div class="dash-daypass-plans-container">
                 ${plansHtmlStr}
               </div>
-              <small class="dash-paywall-center">* all payments pro-rata above the minimum.</small>
+              <small class="dash-daypass-center">* all payments pro-rata above the minimum.</small>
+              <small class="dash-daypass-center">Transaction fingerprint not transferrable between devices.</small>
             </div>
-          </div>
-        </dash-daypass-paywall>
+        </dash-daypass>
 			`
     _protectedContent.insertAdjacentHTML(
       'beforebegin',
       paywallHTML
     );
     _protectedContent.remove();
-    console.log(_protectedContent);
   };
 
   DashDayPass.removePaywall = function () {
