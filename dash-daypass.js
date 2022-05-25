@@ -275,8 +275,8 @@
               <div class="dash-daypass-plans-container">
                 ${plansHtmlStr}
               </div>
-              <small class="dash-daypass-center">* all payments pro-rata above the minimum.</small>
-              <small class="dash-daypass-center">Transaction fingerprint not transferrable between devices.</small>
+              <small class="dash-daypass-center">* all payments are reduced by a small fingerprint to anonymously attach the payment to your device.</small>
+              <small class="dash-daypass-center">Transaction fingerprints are not transferrable between devices.</small>
             </div>
         </dash-daypass>
 			`
