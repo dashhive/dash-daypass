@@ -217,6 +217,10 @@
     return true;
   };
 
+  DashDayPass._copyPaymentAddress = function (string){
+    navigator.clipboard.writeText(string)
+  }
+
   DashDayPass._position = "";
   DashDayPass.addPaywall = function ({ address, plans }) {
     // DEV STYLING - better import?
@@ -241,7 +245,9 @@
         <h3>Đ${plan.amount} for ${durationDays} ${durationLabel}. *</h3>
         <div class="dash-daypass_QR-wrapper">
           <fig class="dash-daypass_QR"> 
-            ${plan.svg}
+            <a href="${plan.dashUri}">
+              ${plan.svg}
+            </a>
           </fig>
           <div class="dash-daypass_QR-unhide-button">
             <span>Show&nbsp;</span>
@@ -251,11 +257,11 @@
             <span>&nbsp;QR</span>
           </div>
         </div>
-        <p>Pay with Dash:</p>
+        <p>Pay your fingerprinted amount (Đ${plan.fingerprint}) to:</p>
         <div class="dash-daypass_payment">
           <a href="${plan.dashUri}">${plan.address}</a>
-          <button type="button" id="dash-daypass_copy-button">
-            ${DashDayPassAssets.copyButton}
+          <button type="button" id="dash-daypass_copy-button" onclick="DashDayPass._copyPaymentAddress('${plan.dashUri}')">
+            ${DashDayPassAssets.copyButtonSvg}
           </button>
         </div>
       </div>
@@ -384,7 +390,7 @@
 
 
 var DashDayPassAssets = {}
-DashDayPassAssets.copyButton = `<svg 
+DashDayPassAssets.copyButtonSvg = `<svg 
     version="1.1"
     xmlns="http://www.w3.org/2000/svg" 
 	  viewBox="0 0 460 460"
