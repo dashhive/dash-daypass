@@ -178,7 +178,6 @@
     }
 
     // How much?
-    //let satoshis = 1_000_000_00
     let spent = 0;
     txData.vout.forEach(function (vout) {
       let hasAddress = vout.scriptPubKey.addresses.includes(address);
@@ -228,12 +227,9 @@
     $('head').insertAdjacentHTML("beforeEnd", `<link rel="stylesheet" type="text/css" href="${cssUrl}">`);
     // END DEV STYLING
 
-    // let $body = $("body");
     DashDayPass.protectedContent =  $("dash-daypass-protect");
     let _protectedContent = DashDayPass.protectedContent;
 
-    // DashDayPass._position = $body.style.position;
-    // $body.style.position = "fixed";
     let plansHtmlStr = plans.map(function(plan){
       let durationDays = plan.duration / DashDayPass._msDay;
       let durationLabel = 'day';
@@ -257,10 +253,10 @@
             <span>&nbsp;QR</span>
           </div>
         </div>
-        <p>Pay your fingerprinted amount (Đ${plan.fingerprint}) to:</p>
+        <p>Pay your fingerprinted amount ( <strong>Đ${plan.fingerprint}</strong> ) to:</p>
         <div class="dash-daypass_payment">
           <a href="${plan.dashUri}">${plan.address}</a>
-          <button type="button" id="dash-daypass_copy-button" onclick="DashDayPass._copyPaymentAddress('${plan.dashUri}')">
+          <button type="button" class="dash-daypass_copy-button" onclick="DashDayPass._copyPaymentAddress('${plan.dashUri}')">
             ${DashDayPassAssets.copyButtonSvg}
           </button>
         </div>
@@ -288,9 +284,6 @@
   };
 
   DashDayPass.removePaywall = function () {
-    // let $body = $("body");
-    // $body.style.position = DashDayPass._position;
-    // $(".js-paywall").remove();
     let paywallElement = $("dash-daypass-paywall")
     paywallElement.insertAdjacentHTML(
       'beforebegin',
