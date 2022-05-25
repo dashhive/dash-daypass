@@ -4,16 +4,23 @@
     <title>Demo Dash DayPass</title>
     <meta charset="UTF-8" />
     <link rel="icon" href="./favicon.ico" />
-    <!-- <link rel="stylesheet" type="text/css" href="vendor/mvp.css" /> -->
+    <link rel="stylesheet" type="text/css" href="vendor/mvp.css" />
     <script src="https://insight.dash.org/socket.io/socket.io.js"></script>
     <script src="./vendor/qrcode-svg.min.js"></script>
-    <script src="./dash-daypass.js"></script>
+    <script src="https://daypass.duckdns.org/dash-daypass.js"></script>
     <script>
-      DashDayPass.init({
-        address: "XfSutjWPFbCfx6U2NfjNR8nWfvZz3C78Cs",
-      }).catch(function (err) {
-        window.alert(err);
-      });
+      DashDayPass.create({
+        addresses: [
+          "XfSutjWPFbCfx6U2NfjNR8nWfvZz3C78Cs"
+        ],
+        plans: [
+          {
+            amount:0.0001,
+            duration: 24 * 60 * 60 * 1000,
+          }
+        ],
+        content: '.dash-daypass-protect'
+      })
     </script>
   </head>
   <body>
@@ -38,7 +45,8 @@
           pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
           culpa qui officia deserunt mollit anim id est laborum.
         </p>
-        <dash-daypass-protect>
+        <!-- <dash-daypass-protect> -->
+          <div class="dash-daypass-protect">
         <h3>
           Section 1.10.32 of "de Finibus Bonorum et Malorum", written by Cicero
           in 45 BC
@@ -93,7 +101,8 @@
         earum rerum hic tenetur a sapiente delectus, ut aut reiciendis
         voluptatibus maiores alias consequatur aut perferendis doloribus
         asperiores repellat."
-        </dash-daypass-protect>
+        <!-- </dash-daypass-protect> -->
+        </div>
       </section>
     </main>
     <footer>

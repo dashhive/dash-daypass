@@ -77,7 +77,8 @@ dash-daypass a:hover{
   width:min-content;
 }
 .dash-daypass-plan p {
-  margin: 0;
+  margin: 0 1rem;
+  width: max-content;
 }
 .dash-daypass a {
   font-weight: 500;
@@ -139,6 +140,8 @@ dash-daypass .dash-daypass_copy-button {
     width: 90%;
   }
   .dash-daypass-plan p {
+    display: inline;
+    width: max-content;
     text-align: center;
   }
 

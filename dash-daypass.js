@@ -1,52 +1,53 @@
 (function (exports) {
   "use strict";
-
+  // logme && console.log(logme)
   function $(sel, el) {
     return (el || document).querySelector(sel);
   }
-
+  
   /*
   function $$(sel, el) {
     return (el || document).querySelectorAll(sel);
   }
   */
-
+  
   let QRCode = window.QRCode;
-
+  
   let DashDayPass = {};
-  DashDayPass.protectedContent = {};
-
+  DashDayPass._protectedContent = {};
+  
   DashDayPass._msDay = 24 * 60 * 60 * 1000;
   DashDayPass._satoshis = 100 * 1000 * 1000;
   DashDayPass._toSatoshis = function (value) {
     return Math.round(parseFloat(value) * DashDayPass._satoshis);
   };
+  DashDayPass._toClipboard = function (string){
+    navigator.clipboard.writeText(string)
+  }
 
-  DashDayPass.init = async function ({ address, plans }) {
+  DashDayPass.create = async function ({ addresses, plans , content}) {
     // TODO pro-rate payments that are between plans
+    let contentSelector = content
+
+    if(!addresses.length){
+      throw new Error('No Dash payment addresess provided')
+    }
+    let addressIndex = Math.floor(Math.random() * addresses.length)
+    let address = addresses[addressIndex]
+
     if (!plans) {
       plans = [
         {
           amount: 0.0001,
           duration: 24 * 60 * 60 * 1000,
-          svg:null, // QRcode with default payment amount for this tier
-          address:address,
         },
         {
           amount: 0.001,
-          duration: 10*24 * 60 * 60 * 1000,
-          svg: null, // QRcode with default payment amount for this tier
-          address:address,
-        },
-        {
-          amount: 0.001,
-          duration: 10*24 * 60 * 60 * 1000,
-          svg: null, // QRcode with default payment amount for this tier
-          address:address,
+          duration: 10 * 24 * 60 * 60 * 1000,
         },
       ];
     }
-    DashDayPass._randomize({ address, plans });
+    DashDayPass._fingerprint({ address, plans });
 
     DashDayPass._address = address;
     // Which address?
@@ -64,12 +65,12 @@
     if (!isPaid) {
       DashDayPass._listenTxLock({ address, plans });
       onDomReady(function () {
-        DashDayPass.addPaywall({ address, plans });
+        DashDayPass._addPaywall({ address, plans , contentSelector});
       });
     }
   };
 
-  DashDayPass._randomize = async function ({ address, plans }) {
+  DashDayPass._fingerprint = async function ({ address, plans }) {
     plans.forEach(function (plan) {
       let amount = plan.amount;//plans[0].amount;
       let leeway = amount * (plans[0].leeway || 0.1);
@@ -216,19 +217,24 @@
     return true;
   };
 
-  DashDayPass._copyPaymentAddress = function (string){
-    navigator.clipboard.writeText(string)
+  DashDayPass._getProtectedContent = function(selector){
+    let content = $(selector)
+    if(content){
+      return content
+    }
+
+    throw new Error('Unable to locate content')
   }
 
   DashDayPass._position = "";
-  DashDayPass.addPaywall = function ({ address, plans }) {
+  DashDayPass._addPaywall = function ({ address, plans , contentSelector}) {
     // DEV STYLING - better import?
     let cssUrl = 'dash-daypass.css';
     $('head').insertAdjacentHTML("beforeEnd", `<link rel="stylesheet" type="text/css" href="${cssUrl}">`);
     // END DEV STYLING
 
-    DashDayPass.protectedContent =  $("dash-daypass-protect");
-    let _protectedContent = DashDayPass.protectedContent;
+    DashDayPass._protectedContent = DashDayPass._getProtectedContent(contentSelector);
+    let _protectedContent = DashDayPass._protectedContent;
 
     let plansHtmlStr = plans.map(function(plan){
       let durationDays = plan.duration / DashDayPass._msDay;
@@ -255,7 +261,7 @@
         </div>
         <p>Pay your fingerprinted amount ( <strong>Đ${plan.fingerprint}</strong> ) to:</p>
         <div class="dash-daypass_payment">
-          <a href="${plan.dashUri}">${plan.address}</a>
+          <a href="${plan.dashUri}">${address}</a>
           <button type="button" class="dash-daypass_copy-button" onclick="DashDayPass._copyPaymentAddress('${plan.dashUri}')">
             ${DashDayPassAssets.copyButtonSvg}
           </button>
@@ -287,7 +293,7 @@
     let paywallElement = $("dash-daypass-paywall")
     paywallElement.insertAdjacentHTML(
       'beforebegin',
-      DashDayPass.protectedContent.innerHTML
+      DashDayPass._protectedContent//.innerHTML
     );
     paywallElement.remove()
   };
@@ -304,7 +310,7 @@
     });
     socket.on(eventToListenTo, function (data) {
       // TODO limit time to 5 minutes?
-      console.log(`DEBUG: txlock`, data);
+      // console.log(`DEBUG: txlock`, data);
       // look for address
 
       /*
