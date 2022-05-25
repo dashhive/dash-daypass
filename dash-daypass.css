@@ -30,30 +30,13 @@
     }
 }
 dash-daypass{
-  /* box-sizing: border-box;
-  position: absolute; */
   background-color: rgba(0,0,0,0);
-  /* top:0; */
   height: 100%;
   width: 100%;
   font-size: 1.0em;
 }
-/* .dash-daypass_gradient{
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  width: 100%;
-  height: 95%;
-  max-height: 90%;
-  background-color: var(--color-dash-daypass-bg);
-  background: linear-gradient(to top,  var(--color-dash-daypass-bg) 95%, var(--color-dash-daypass-bg-50) 100%);
-} */
 .dash-daypass_body{
-  /* position: absolute; */
-  /* bottom: 0px; */
-  /* left: 0px; */
   width: 100%;
-  /* height: 80%; */
   background-color: var(--color-dash-daypass-bg);
   color: var(--color-dash-daypass-text);
   display: flex;
@@ -68,7 +51,6 @@ dash-daypass{
   display: flex;
   justify-content: space-evenly;
   overflow-x: scroll;
-  /* flex-wrap: wrap; */
 }
 .dash-daypass-plan{
   display: flex;
