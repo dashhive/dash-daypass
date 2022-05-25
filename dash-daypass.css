@@ -12,7 +12,7 @@
     --bg-elevation-1:rgba(0,0,0,0.03);
     --shadow-elevation-1:rgba(0,0,0,0.1);
 
-    --qr-brightness: brightness(0.98);
+    --brightness-dash-daypass-qr: brightness(0.98);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -26,7 +26,7 @@
         --bg-elevation-1:rgba(255,255,255,0.02);
         --shadow-elevation-1:rgba(0,0,0,0.12);
 
-        --qr-brightness: brightness(0.9);
+        --brightness-dash-daypass-qr: brightness(0.9);
     }
 }
 dash-daypass{
@@ -100,9 +100,9 @@ dash-daypass{
 .dash-daypass_QR{
   margin: 1em;
   min-width: 250px;
-  filter: var(--qr-brightness);
+  filter: var(--brightness-dash-daypass-qr);
 }
-.dash-daypass_QR svg {
+.dash-daypass_QR-link {
   width: 100%;
 }
 
@@ -142,6 +142,9 @@ dash-daypass button {
   .dash-daypass-plan{
     width: 90%;
   }
+  .dash-daypass-plan p {
+    text-align: center;
+  }
 
   dash-daypass a {
     font-size: 3.5vw;
@@ -163,6 +166,7 @@ dash-daypass button {
   }
   .dash-daypass_QR{
     display:none;
+  min-width: 400px;
   }
   .dash-daypass_QR-wrapper{
     width:fit-content;

@@ -245,7 +245,7 @@
         <h3>Đ${plan.amount} for ${durationDays} ${durationLabel}. *</h3>
         <div class="dash-daypass_QR-wrapper">
           <fig class="dash-daypass_QR"> 
-            <a href="${plan.dashUri}">
+            <a class="dash-daypass_QR-link" href="${plan.dashUri}">
               ${plan.svg}
             </a>
           </fig>
