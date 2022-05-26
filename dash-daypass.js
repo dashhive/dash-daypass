@@ -73,7 +73,7 @@
   DashDayPass._fingerprint = async function ({ address, plans }) {
     plans.forEach(function (plan) {
       let amount = plan.amount;//plans[0].amount;
-      let leeway = amount * (plans[0].leeway || 0.1);
+      let leeway = amount * (plans[0].leeway || 0.01);
 
       let fingerprint = Math.random() * leeway;
       amount -= fingerprint;

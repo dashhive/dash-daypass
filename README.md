@@ -4,9 +4,6 @@ A simple Đash PayWall for content sites.
 
 See [daypass.duckdns.org/](https://daypass.duckdns.org/) for examples.
 
-<kbd><img width="456" alt="Screen Shot 2022-04-14 at 12 14 20 AM" src="https://user-images.githubusercontent.com/122831/163325020-511136a9-14cf-4e68-a814-0fd57f9a2e74.png"></kbd>
-
-
 |![Desktop - Light](https://user-images.githubusercontent.com/72463218/170392947-3daf9e2d-8e4f-48e3-aa37-878097f672e3.png)|![Desktop - Dark](https://user-images.githubusercontent.com/72463218/170393007-6986a738-0e1b-422f-b419-f4dd4baddee5.png)|![Mobile - Dark](https://user-images.githubusercontent.com/72463218/170393349-c2a07017-8d86-4afb-b67b-0d2f981275ee.png)|![Mobile - Light](https://user-images.githubusercontent.com/72463218/170393201-f803ba79-b302-4273-b768-7fd2747179a2.png)|
 |---|---|---|---|
 # Usage (in development)
@@ -113,9 +110,17 @@ Define your own with:
 </script>
 ```
 
+## NOTE:
+
+#### In order to anonymously fingerprint a device, a slightly smaller amount than specified in the Plan is requested from your customer.  There are no charges for using this service (except the normal network fees.). Th amount you receive should be within 1% of the stated amount in the Plan.
+
+Due to the limitations in the number of ecimal places ina  Dash transaction, there will also be some events where users are issued the same fingerprint amount as someone who has already paid within the last 10 minutes, so they may gain access to your content for free, around 1% of the time.  Each new address you add to the "addresses" field reduces the chance of this happening, so add a few!
+
 # Notes & References
 
 - `txlock` is _InstantSend_
 - Insight's API: https://github.com/dashevo/insight-api#example-usage
 - Task: https://trello.com/c/S1MStQgD/196-dash-daypass
 - Spec: https://docs.google.com/document/d/1ExkUP35zm_vDNb-moSOSdbsjDCo4wZkuT4ROOLx_tWA/edit#
+
+<kbd><img width="456" alt="Screen Shot 2022-04-14 at 12 14 20 AM" src="https://user-images.githubusercontent.com/122831/163325020-511136a9-14cf-4e68-a814-0fd57f9a2e74.png"></kbd>
