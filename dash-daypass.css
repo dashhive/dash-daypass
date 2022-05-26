@@ -62,7 +62,6 @@ dash-daypass a:hover{
 .dash-daypass-plans-container{
   width: 100%;
   display: flex;
-  justify-content: space-evenly;
   overflow-x: scroll;
 }
 .dash-daypass-plan{
@@ -75,6 +74,12 @@ dash-daypass a:hover{
   background-color: var(--bg-elevation-1);
   box-shadow: var(--box-shadow) var(--shadow-elevation-1);
   width:min-content;
+}
+.dash-daypass-plan:first-child{
+  margin-left: auto;
+}
+.dash-daypass-plan:last-child{
+  margin-right: auto;
 }
 .dash-daypass-plan p {
   margin: 0 1rem;
