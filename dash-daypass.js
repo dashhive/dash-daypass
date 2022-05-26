@@ -3,7 +3,7 @@
   // logme && console.log(logme)
   function $(sel, el) {
     return (el || document).querySelector(sel);
-  }
+  };
   
   /*
   function $$(sel, el) {
@@ -23,17 +23,17 @@
   };
   DashDayPass._toClipboard = function (string){
     navigator.clipboard.writeText(string)
-  }
+  };
 
   DashDayPass.create = async function ({ addresses, plans , content}) {
     // TODO pro-rate payments that are between plans
-    let contentSelector = content
+    let contentSelector = content;
 
     if(!addresses.length){
       throw new Error('No Dash payment addresess provided')
-    }
-    let addressIndex = Math.floor(Math.random() * addresses.length)
-    let address = addresses[addressIndex]
+    };
+    let addressIndex = Math.floor(Math.random() * addresses.length);
+    let address = addresses[addressIndex];
 
     if (!plans) {
       plans = [
@@ -46,7 +46,7 @@
           duration: 10 * 24 * 60 * 60 * 1000,
         },
       ];
-    }
+    };
     DashDayPass._fingerprint({ address, plans });
 
     DashDayPass._address = address;
@@ -218,20 +218,20 @@
   };
 
   DashDayPass._getProtectedContent = function(selector){
-    let selectors = [selector,'dash-daypass-protect', '.dash-daypass-protect']
+    let selectors = [selector,'dash-daypass-protect', '.dash-daypass-protect'];
     for (let sel of selectors) {
       if([
         '0', ''
       ].includes(sel)){
         continue
-      }
-      let content = $(sel)
+      };
+      let content = $(sel);
       if(content){
         return content
-      }
+      };
     }
 
-    throw new Error('Unable to locate content')
+    throw new Error('Unable to locate content');
   }
 
   DashDayPass._position = "";
@@ -295,12 +295,12 @@
   };
 
   DashDayPass.removePaywall = function () {
-    let paywallElement = $("dash-daypass-paywall")
+    let paywallElement = $("dash-daypass-paywall");
     paywallElement.insertAdjacentHTML(
       'beforebegin',
       DashDayPass._protectedContent//.innerHTML
     );
-    paywallElement.remove()
+    paywallElement.remove();
   };
 
   DashDayPass._listenTxLock = async function ({ address, plans }) {
@@ -393,7 +393,7 @@
 
 
 
-var DashDayPassAssets = {}
+var DashDayPassAssets = {};
 DashDayPassAssets.copyButtonSvg = `<svg 
     version="1.1"
     xmlns="http://www.w3.org/2000/svg" 
@@ -413,7 +413,7 @@ DashDayPassAssets.copyButtonSvg = `<svg
 				c-1.58,0-2.865-1.285-2.865-2.864V172.863c0-1.58,1.285-2.865,2.865-2.865h254.272c1.58,0,2.865,1.285,2.865,2.865v254.273h0.001
 				C291.206,428.715,289.92,430,288.341,430z"/>
 		</g>
-</svg>`
+</svg>`;
 DashDayPassAssets.dashLogoSvg = `<svg
       xmlns="http://www.w3.org/2000/svg"
       width="100%" height="100%"
@@ -443,7 +443,7 @@ DashDayPassAssets.dashLogoSvg = `<svg
              56.47,43.46 57.10,42.28 57.65,41.04
              57.65,41.04 63.43,22.96 63.43,22.96
              63.93,21.72 64.12,20.35 63.93,19.11 Z" />
-    </svg>`
+    </svg>`;
 DashDayPassAssets.css = "<style>" + `:root {
     --color-dash-daypass-brand: #1E75BB;
     --color-dash-daypass-bg: rgba(255, 255, 255);
@@ -626,4 +626,4 @@ dash-daypass .dash-daypass_copy-button {
   .dash-daypass_payment{
     align-items: flex-start;
   }
-}` + "</style>"
+}` + "</style>";
