@@ -218,9 +218,17 @@
   };
 
   DashDayPass._getProtectedContent = function(selector){
-    let content = $(selector)
-    if(content){
-      return content
+    let selectors = [selector,'dash-daypass-protect', '.dash-daypass-protect']
+    for (let sel of selectors) {
+      if([
+        '0', ''
+      ].includes(sel)){
+        continue
+      }
+      let content = $(sel)
+      if(content){
+        return content
+      }
     }
 
     throw new Error('Unable to locate content')
